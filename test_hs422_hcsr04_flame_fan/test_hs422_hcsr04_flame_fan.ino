@@ -1,8 +1,8 @@
 #include <Servo.h>
 #include <HCMotor.h>
 
-Servo lservo; // First servo
-Servo rservo; // Second servo
+Servo lservo; // left wheel - section view from back of robot
+Servo rservo; // right wheel - section view from back of robot
 
 #define TRIG_PIN 5 
 #define ECHO_PIN 4 
@@ -28,7 +28,7 @@ int rservoAngle = 0;
 long distance = 0;
 
 long smoothTemp = 0;
-long average = 10;
+long average = 5;
 
 
 void setup() {
@@ -61,7 +61,7 @@ void implement_motor(bool switch_status){
   long speed = 0;
 
   if (switch_status == 1){
-    speed = map(500, 0, 1024, 0, 100);
+    speed = map(300, 0, 1024, 0, 100);
   } else speed = map(0, 0, 1024, 0, 100);
   HCMotor.OnTime(0, speed);
 }
@@ -70,7 +70,7 @@ void loop() {
 
   digitalWrite(flameled, HIGH);
 
-  // Trigger the sensor
+  // Trigger the ultrasonic sensor
   digitalWrite(TRIG_PIN, LOW);
   delayMicroseconds(2);
   digitalWrite(TRIG_PIN, HIGH);
@@ -89,7 +89,6 @@ void loop() {
     int angle = 8; // robot move forward Desired angle offset from neutral (e.g., 30° forward)
     int lcorrection = 4;  //robot move forward
     int rcorrection = -3; //robot move forward
-
   
     lservoAngle = lneutral - angle + lcorrection;       //reverse for lservo
     rservoAngle = rneutral + angle + rcorrection;       //forward for rservo
@@ -106,8 +105,6 @@ void loop() {
 
   }
 
-  
-
   // Write adjusted angles to servos
   lservo.write(lservoAngle);
   rservo.write(rservoAngle);
@@ -119,7 +116,7 @@ this section of code is for checking flame and on/off fan
 */
   // long smoothTemp = 0;
   // long average = 10;
-  for (int n = 0; n < average; n++){//this for loop to avoid interference from ambiance
+  for (int n = 0; n < average; n++){//this 'for' loop to avoid interference from ambiance
     smoothTemp += analogRead(temppin);
     //Serial.println(analogRead(temppin));
     //delay(500);

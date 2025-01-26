@@ -29,6 +29,7 @@ long distance = 0;
 
 long smoothTemp = 0;
 long average = 5;
+int start_and_check = 0;
 
 
 void setup() {
@@ -61,80 +62,112 @@ void implement_motor(bool switch_status){
   long speed = 0;
 
   if (switch_status == 1){
-    speed = map(300, 0, 1024, 0, 100);
+    speed = map(500, 0, 1024, 0, 100);
   } else speed = map(0, 0, 1024, 0, 100);
   HCMotor.OnTime(0, speed);
 }
 
 void loop() {
 
-  digitalWrite(flameled, HIGH);
-
-  // Trigger the ultrasonic sensor
-  digitalWrite(TRIG_PIN, LOW);
-  delayMicroseconds(2);
-  digitalWrite(TRIG_PIN, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(TRIG_PIN, LOW);
-
-  // Measure the echo duration
-  long duration = pulseIn(ECHO_PIN, HIGH);
-  if (duration != 0){
-    // Calculate the distance in cm
-    distance = duration / 58; // 58 µs per cm
-  }
-
-  if (distance > 5) {
-  //robot move forward
-    int angle = 8; // robot move forward Desired angle offset from neutral (e.g., 30° forward)
-    int lcorrection = 4;  //robot move forward
-    int rcorrection = -3; //robot move forward
-  
-    lservoAngle = lneutral - angle + lcorrection;       //reverse for lservo
-    rservoAngle = rneutral + angle + rcorrection;       //forward for rservo
-
-  } else {
-  //robot move  backward
-    int angle = 3;  //robot move backward
-    int lcorrection = 1;  //robot move backward
-    int rcorrection = -2; //robot move backward
-
-  // Calculate actual servo positions - robot move backward
-    lservoAngle = lneutral + angle + lcorrection;        // Forward for lservo
-    rservoAngle = rneutral - angle + rcorrection;        // Reverse for rservo
-
-  }
-
-  // Write adjusted angles to servos
-  lservo.write(lservoAngle);
-  rservo.write(rservoAngle);
-
-  ////delay(1000); // Wait for 1 second
-
-/*
-this section of code is for checking flame and on/off fan
-*/
-  // long smoothTemp = 0;
-  // long average = 10;
-  for (int n = 0; n < average; n++){//this 'for' loop to avoid interference from ambiance
-    smoothTemp += analogRead(temppin);
-    //Serial.println(analogRead(temppin));
-    //delay(500);
-  }
-
-  smoothTemp = smoothTemp / average;
-  //Serial.println("value of smooth temperature ");
-  //Serial.println(smoothTemp);
-
-  if (smoothTemp > 300){
+  if (start_and_check == 0){ //implement checking servos and fan and led at the first loop
     digitalWrite(flameled, LOW);
-    implement_motor(true);
-    delay(3000);
-    implement_motor(false);
-    //delay(3000);
-  } 
 
-  delay(1000);
+    implement_motor(true);
+
+    lservo.write(lneutral-30);
+    rservo.write(rneutral+30);
+    delay(3000);
+
+    lservo.write(lneutral+30);
+    rservo.write(rneutral-30);
+    delay(3000);
+
+    lservo.write(lneutral);
+    rservo.write(rneutral);
+    delay(2000);
+
+    //implement_motor(true);
+
+    //delay(3000);
+    implement_motor(false);
+
+    start_and_check = 1;//complete the first loop
+  } else { //implement the main logic at the second loop
+    digitalWrite(flameled, HIGH);
+
+    // Trigger the ultrasonic sensor
+    digitalWrite(TRIG_PIN, LOW);
+    delayMicroseconds(2);
+    digitalWrite(TRIG_PIN, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(TRIG_PIN, LOW);
+
+    // Measure the echo duration
+    long duration = pulseIn(ECHO_PIN, HIGH);
+    if (duration != 0){
+      // Calculate the distance in cm
+      distance = duration / 58; // 58 µs per cm
+    }
+
+    if (distance > 10) {
+    //robot move forward
+      int angle = 8; // robot move forward Desired angle offset from neutral (e.g., 30° forward)
+      int lcorrection = 4;  //robot move forward
+      int rcorrection = -2; //robot move forward
+    
+      lservoAngle = lneutral - angle + lcorrection;       //reverse for lservo
+      rservoAngle = rneutral + angle + rcorrection;       //forward for rservo
+
+    } else {
+    //robot move  backward
+      int angle = 3;  //robot move backward
+      int lcorrection = 1;  //robot move backward
+      int rcorrection = -2; //robot move backward
+
+    // Calculate actual servo positions - robot move backward
+      lservoAngle = lneutral + angle + lcorrection;        // Forward for lservo
+      rservoAngle = rneutral - angle + rcorrection;        // Reverse for rservo
+
+    }
+
+    // Write adjusted angles to servos
+    lservo.write(lservoAngle);
+    rservo.write(rservoAngle);
+
+    ////delay(1000); // Wait for 1 second
+
+  /*
+  this section of code is for checking flame and on/off fan
+  */
+    // long smoothTemp = 0;
+    // long average = 10;
+    for (int n = 0; n < average; n++){//this 'for' loop to avoid interference from ambiance
+      smoothTemp += analogRead(temppin);
+      //Serial.println(analogRead(temppin));
+      //delay(500);
+    }
+
+    smoothTemp = smoothTemp / average;
+    //Serial.println("value of smooth temperature ");
+    //Serial.println(smoothTemp);
+
+    if (smoothTemp > 500){
+
+      lservo.write(lneutral);
+      rservo.write(rneutral);
+
+      digitalWrite(flameled, LOW);
+      implement_motor(true);
+      delay(6000);
+      implement_motor(false);
+      //delay(3000);
+    } 
+
+    delay(1000);
+    start_and_check = 1;
+    }
+  //start_and_check = 1;//complete the next loop
+  
 
 }
 

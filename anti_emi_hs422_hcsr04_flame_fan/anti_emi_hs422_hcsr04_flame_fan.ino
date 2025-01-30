@@ -1,5 +1,5 @@
 #include <Servo.h>
-#include <HCMotor.h>
+#include <HCMotor.h> //this library implement some logic algorith that create interference with servo motors-2025-01-29
 
 Servo lservo; // left wheel - section view from back of robot
 Servo rservo; // right wheel - section view from back of robot
@@ -21,7 +21,7 @@ int distmin = 12;
 int temppin = A0;
 
 // Neutral angles for the servos
-const int lneutral = 87;  // Neutral position for servo left
+const int lneutral = 86;  // Neutral position for servo left
 const int rneutral = 95;  // Neutral position for servo right
 int lservoAngle = 0;
 int rservoAngle = 0;
@@ -62,7 +62,7 @@ void implement_motor(bool switch_status){
   long speed = 0;
 
   if (switch_status == 1){
-    speed = map(500, 0, 1024, 0, 100);
+    speed = map(400, 0, 1024, 0, 100);
   } else speed = map(0, 0, 1024, 0, 100);
   HCMotor.OnTime(0, speed);
 }
@@ -100,7 +100,7 @@ void loop() {
 
     //lservo.write(lneutral-30);
     //rservo.write(rneutral+30);
-    smoothServoMovement(lneutral-30, rneutral+30, 1, 2);
+    smoothServoMovement(lneutral-5, rneutral+8, 1, 2);
     delay(2000);
 
     // lservo.write(lneutral+30);
@@ -135,9 +135,9 @@ void loop() {
 
     if (distance > 10) {
     //robot move forward
-      int angle = 8; // robot move forward Desired angle offset from neutral (e.g., 30° forward)
-      int lcorrection = 4;  //robot move forward
-      int rcorrection = -2; //robot move forward
+      int angle = 5; // robot move forward Desired angle offset from neutral (e.g., 30° forward)
+      int lcorrection = 2;  //robot move forward
+      int rcorrection = -1; //robot move forward
     
       lservoAngle = lneutral - angle + lcorrection;       //reverse for lservo
       rservoAngle = rneutral + angle + rcorrection;       //forward for rservo
@@ -176,18 +176,37 @@ void loop() {
     
     if (smoothTemp > 200){
 
-      //lservo.write(lneutral);
-      //rservo.write(rneutral);
-      smoothServoMovement(lneutral, rneutral, 1, 1);
+      //we will stop two servos and reducing EMI from servos to the robot
+      lservo.write(lneutral);
+      delay(100);
+      rservo.write(rneutral);
+      delay(3000);
+      //smoothServoMovement(lneutral, rneutral, 1, 1);
+      
+      //lservo.detach();  // detach lservo to pin 3
+      //rservo.detach(); // detach rservo to pin 6
+
 
       digitalWrite(flameled, LOW);
-      implement_motor(true);
-      delay(6000);
-      implement_motor(false);
+      
+      //implement_motor(true);//detect something abnormal with HCmotor library 2025-01-29
+      analogWrite(fanpin, 250);//LK added 2025-01-18
+      
+      delay(3000);
+
+      //implement_motor(false);//detect something abnormal with HCmotor library 2025-01-29
+      analogWrite(fanpin, 0);//LK added 2025-01-18
       //delay(3000);
+
+      //lservo.attach(3);  // Attach lservo to pin 3
+      //rservo.attach(6); // Attach rservo to pin 6
+
+      // Write adjusted angles to servos
+      //lservo.write(lservoAngle);
+      //rservo.write(rservoAngle);
     } 
 
-    delay(1000);
+    //delay(1000);
     start_and_check = 1;
   }
 }

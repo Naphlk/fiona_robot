@@ -33,8 +33,8 @@ int start_and_check = 0;
 
 
 void setup() {
-  lservo.attach(3);  // Attach lservo to pin 3
-  rservo.attach(6); // Attach rservo to pin 6
+  lservo.attach(12);  // Attach lservo to pin 12
+  rservo.attach(13); // Attach rservo to pin 13
 
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
@@ -176,26 +176,26 @@ void loop() {
     
     if (smoothTemp > 200){
 
+      digitalWrite(flameled, LOW);
+      
+      implement_motor(true);//detect something abnormal with HCmotor library 2025-01-29
+      //analogWrite(fanpin, 250);//LK added 2025-01-18
+
       //we will stop two servos and reducing EMI from servos to the robot
       lservo.write(lneutral);
       delay(100);
       rservo.write(rneutral);
-      delay(3000);
+      delay(5000);
       //smoothServoMovement(lneutral, rneutral, 1, 1);
       
       //lservo.detach();  // detach lservo to pin 3
       //rservo.detach(); // detach rservo to pin 6
 
-
-      digitalWrite(flameled, LOW);
       
-      //implement_motor(true);//detect something abnormal with HCmotor library 2025-01-29
-      analogWrite(fanpin, 250);//LK added 2025-01-18
-      
-      delay(3000);
+      //delay(3000);
 
-      //implement_motor(false);//detect something abnormal with HCmotor library 2025-01-29
-      analogWrite(fanpin, 0);//LK added 2025-01-18
+      implement_motor(false);//detect something abnormal with HCmotor library 2025-01-29
+      //analogWrite(fanpin, 0);//LK added 2025-01-18
       //delay(3000);
 
       //lservo.attach(3);  // Attach lservo to pin 3

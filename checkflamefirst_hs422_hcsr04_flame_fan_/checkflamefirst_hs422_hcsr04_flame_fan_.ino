@@ -11,7 +11,7 @@ Servo rservo; // right wheel - section view from back of robot
 #define MOTOR_PIN 3
 
 /* Create an instance of the library */
-HCMotor HCMotor;
+//HCMotor HCMotor;
 
 const int fanpin = 3;//LK added 2025-01-18
 const int flameled = 2;
@@ -40,16 +40,16 @@ void setup() {
   pinMode(ECHO_PIN, INPUT);
 
   /* Initialise the library */
-  HCMotor.Init();
+  //HCMotor.Init();
 
   /* Attach motor 0 to digital pin 9. The first parameter specifies the 
      motor number, the second is the motor type, and the third is the 
      digital pin that will control the motor */
-  HCMotor.attach(0, DCMOTOR, MOTOR_PIN);
+  //HCMotor.attach(0, DCMOTOR, MOTOR_PIN);
 
   /* Set the duty cycle of the PWM signal in 100uS increments. 
      Here 100 x 100uS = 1mS duty cycle. */
-  HCMotor.DutyCycle(0, 100);
+  //HCMotor.DutyCycle(0, 100);
 
   pinMode(fanpin, OUTPUT);
   pinMode(flameled, OUTPUT);
@@ -64,6 +64,7 @@ void setup() {
   Serial.begin(9600); // Initialize serial communication
 }
 
+/*
 void implement_motor(bool switch_status){
   long speed = 0;
 
@@ -72,6 +73,7 @@ void implement_motor(bool switch_status){
   } else speed = map(0, 0, 1024, 0, 100);
   HCMotor.OnTime(0, speed);
 }
+*/
 
 void smoothServoMovement(int targetLAngle, int targetRAngle, int step, int delayBetweenSteps) {
   //int step = 1; // Adjust this value for smoother or faster transitions
@@ -156,37 +158,48 @@ void loop() {
         
         //implement_motor(true);//detect something abnormal with HCmotor library 2025-01-29
         //analogWrite(fanpin, 250);//LK added 2025-01-18
-        OCR2B = 100; // 100/255 (~40% speed)
+        OCR2B = 50; // 50/255 (~25% speed)
         delay(200);
         
 
         //we will stop two servos and reducing EMI from servos to the robot
+        lservo.write(lneutral+1);
+        delay(200);
+        rservo.write(rneutral-1);
+        delay(200);
         lservo.write(lneutral);
-        delay(100);
+        delay(200);
         rservo.write(rneutral);
-        delay(100);
+      
         //smoothServoMovement(lneutral, rneutral, 1, 1);
+        //lservo.detach();  // detach lservo to pin 12
+        //rservo.detach(); // detach rservo to pin 13
         
-        //lservo.detach();  // detach lservo to pin 3
-        //rservo.detach(); // detach rservo to pin 6
+        //lservo.write(lservo.read());  // Hold the current position
+        //rservo.write(rservo.read());
+
+        //lservo.writeMicroseconds(1500);  // Stop left servo
+        //rservo.writeMicroseconds(1500);  // Stop right servo
 
         
-        //delay(3000);
+        //delay(100);
 
         //implement_motor(false);//detect something abnormal with HCmotor library 2025-01-29
         //analogWrite(fanpin, 0);//LK added 2025-01-18
         //delay(3000);
+        OCR2B = 100; // 100/255 (~40% speed)
+        delay(2000);
         OCR2B = 200; // 200/255 (~80% speed)
         delay(2000);
         OCR2B = 255; // Stop motor (inverted mode)
         delay(100);
 
-        //lservo.attach(3);  // Attach lservo to pin 3
-        //rservo.attach(6); // Attach rservo to pin 6
+        //lservo.attach(12);  // Attach lservo to pin 12
+        //rservo.attach(13); // Attach rservo to pin 13
 
         // Write adjusted angles to servos
-        //lservo.write(lservoAngle);
-        //rservo.write(rservoAngle);
+        lservo.write(lservoAngle);
+        rservo.write(rservoAngle);
       } else {
         //this section of code for scanning obstructive objects
         digitalWrite(flameled, HIGH);
@@ -207,16 +220,16 @@ void loop() {
 
         if (distance > 10) {
         //robot move forward
-          int angle = 5; // robot move forward Desired angle offset from neutral (e.g., 30° forward)
+          int angle = 5; 
           int lcorrection = 2;  //robot move forward
-          int rcorrection = -1; //robot move forward
+          int rcorrection = 0; //robot move forward
         
           lservoAngle = lneutral - angle + lcorrection;       //reverse for lservo
           rservoAngle = rneutral + angle + rcorrection;       //forward for rservo
 
         } else {
         //robot move  backward
-          int angle = 3;  //robot move backward
+          int angle = 5;  //robot move backward
           int lcorrection = 1;  //robot move backward
           int rcorrection = -2; //robot move backward
 

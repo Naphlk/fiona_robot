@@ -107,11 +107,11 @@ void loop() {
     //implement_motor(true);
     //analogWrite(fanpin, 150);
 
-    lservo.write(lneutral-10);
+    lservo.write(lneutral-5);
     delay(100);
-    rservo.write(rneutral+10);
+    rservo.write(rneutral+5);
     //smoothServoMovement(lneutral-5, rneutral+8, 1, 2);
-    delay(2000);
+    delay(1000);
 
     // lservo.write(lneutral+30);
     // rservo.write(rneutral-30);
@@ -158,18 +158,25 @@ void loop() {
         
         //implement_motor(true);//detect something abnormal with HCmotor library 2025-01-29
         //analogWrite(fanpin, 250);//LK added 2025-01-18
-        OCR2B = 50; // 50/255 (~25% speed)
-        delay(200);
+        //OCR2B = 50; // 50/255 (~25% speed)
+        //delay(50);
         
 
         //we will stop two servos and reducing EMI from servos to the robot
-        lservo.write(lneutral+1);
-        delay(200);
-        rservo.write(rneutral-1);
-        delay(200);
-        lservo.write(lneutral);
-        delay(200);
-        rservo.write(rneutral);
+        lservo.write(lneutral+3);
+        //delay(50);
+        rservo.write(rneutral-3);
+        delay(500);
+
+        lservo.write(lneutral-1);
+        //delay(50);
+        rservo.write(rneutral+2);
+        delay(500);
+
+
+        //lservo.write(lneutral);//fine-tuning and decide do not need to set to neutral - 2025-02-01
+        //delay(50);
+        //rservo.write(rneutral);//fine-tuning and decide do not need to set to neutral 
       
         //smoothServoMovement(lneutral, rneutral, 1, 1);
         //lservo.detach();  // detach lservo to pin 12
@@ -198,8 +205,8 @@ void loop() {
         //rservo.attach(13); // Attach rservo to pin 13
 
         // Write adjusted angles to servos
-        lservo.write(lservoAngle);
-        rservo.write(rservoAngle);
+        //lservo.write(lservoAngle);
+        //rservo.write(rservoAngle);
       } else {
         //this section of code for scanning obstructive objects
         digitalWrite(flameled, HIGH);

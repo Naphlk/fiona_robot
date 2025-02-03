@@ -8,28 +8,34 @@ const int lneutral = 87;  // Neutral position for servo left
 const int rneutral = 95;  // Neutral position for servo right
 
 void setup() {
-  lservo.attach(3);  // Attach lservo to pin 3
-  rservo.attach(6); // Attach rservo to pin 6
+  lservo.attach(12);  // Attach lservo to pin 12
+  rservo.attach(13); // Attach rservo to pin 13
 }
 
 void loop() {
 
   
-  int angle = 8; // robot move forward Desired angle offset from neutral (e.g., 30° forward)
-  int lcorrection = 4;  //robot move forward
-  int rcorrection = -3; //robot move forward
+  int angle = 3; // robot move forward Desired angle offset from neutral (e.g., 30° forward)
+  int lcorrection = 1;  //robot move forward
+  int rcorrection = 1; //robot move forward
 
   //robot move forward
-  int lservoAngle = lneutral - angle + lcorrection;       //reverse for lservo
-  int rservoAngle = rneutral + angle + rcorrection;       //forward for rservo
+  int lservoAngle = lneutral - angle;       //reverse for lservo
+  int rservoAngle = rneutral + (angle + rcorrection);       //forward for rservo
+
+  // Write adjusted angles to servos
+  lservo.write(lservoAngle);
+  rservo.write(rservoAngle);
+
+  delay(5000);
   
   // int angle = 3;  //robot move backward
   // int lcorrection = 1;  //robot move backward
   // int rcorrection = -2; //robot move backward
 
   // // Calculate actual servo positions - robot move backward
-  // int lservoAngle = lneutral + angle + lcorrection;        // Forward for lservo
-  // int rservoAngle = rneutral - angle + rcorrection;        // Reverse for rservo
+  lservoAngle = lneutral + (angle + lcorrection);        // Forward for lservo
+  rservoAngle = rneutral - angle;        // Reverse for rservo
 
 
 
@@ -37,7 +43,7 @@ void loop() {
   lservo.write(lservoAngle);
   rservo.write(rservoAngle);
 
-  delay(2000); // Wait for 1 second
+  delay(5000); // Wait for 5 second
 }
 
 
